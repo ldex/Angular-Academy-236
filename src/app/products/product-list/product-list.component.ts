@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
-import { Observable, EMPTY, combineLatest, Subscription } from 'rxjs';
+import { Observable, EMPTY, combineLatest, Subscription, pipe } from 'rxjs';
 import { tap, catchError, startWith, count, flatMap, map, debounceTime, filter } from 'rxjs/operators';
 
 import { Product } from '../product.interface';
@@ -19,6 +19,8 @@ export class ProductListComponent implements OnInit {
   selectedProduct: Product;
   products$: Observable<Product[]>;
   mostExpensiveProduct$: Observable<Product>;
+  productsNumber$: Observable<number>;
+  productsTotalNumber$: Observable<number>;
   errorMessage;
 
   // Pagination
@@ -26,6 +28,7 @@ export class ProductListComponent implements OnInit {
   start = 0;
   end = this.pageSize;
   currentPage = 1;
+  productsToLoad = this.pageSize * 2;
 
   previousPage() {
     this.start -= this.pageSize;
@@ -56,13 +59,34 @@ export class ProductListComponent implements OnInit {
     private router: Router) {
   }
 
+  loadMore(): void {
+    let take = this.productsToLoad;
+    let skip = this.end;
+
+    this.productService.initProducts(skip, take);
+  }
+
   ngOnInit(): void {
     // Self url navigation will refresh the page ('Refresh List' button)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 
     this.products$ = this
                       .productService
-                      .products$;
+                      .products$
+                      .pipe(
+                        filter(products => products.length > 0)
+                      );
+
+    this.productsNumber$ = this
+                              .products$
+                              .pipe(
+                                map(products => products.length),
+                                startWith(0)
+                              );
+
+    this.productsTotalNumber$ = this
+                                  .productService
+                                  .productsTotalNumber$;
 
     this.mostExpensiveProduct$ = this
                                   .productService
