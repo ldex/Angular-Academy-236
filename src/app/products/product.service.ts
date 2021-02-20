@@ -14,6 +14,7 @@ export class ProductService {
   products$: Observable<Product[]> = this.productsSubject.asObservable();
   mostExpensiveProduct$: Observable<Product>;
   productsTotalNumber$: Observable<number>;
+  productsToLoad: number = 100;
 
   constructor(private http: HttpClient) {
     this.initProducts();
@@ -22,7 +23,7 @@ export class ProductService {
   }
 
   private initProductsTotalNumber() {
-    this.productsTotalNumber$ = this.http.get<number>(this.baseUrl + "count");
+    this.productsTotalNumber$ = this.http.get<number>(this.baseUrl + "count").pipe(shareReplay());
   }
 
   private initMostExpensiveProduct() {
@@ -44,7 +45,7 @@ export class ProductService {
       )
   }
 
-  initProducts(skip: number = 0, take: number = 10) {
+  initProducts(skip: number = 0, take: number = this.productsToLoad) {
     let url = this.baseUrl + `?$skip=${skip}&$top=${take}&$orderby=ModifiedDate%20desc`;
 
     this

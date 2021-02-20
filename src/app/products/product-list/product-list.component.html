@@ -53,7 +53,7 @@
             [disabled]="(productsNumber$ | async) <= end">
         Next Page >
     </button>
-    <button (click)="loadMore()" *ngIf="(productsNumber$ | async) <= end && ((productsNumber$ | async) < (productsTotalNumber$ | async))">
+    <button (click)="loadMore()" *ngIf="(productsNumber$ | async) <= end && !(isLastPage$ | async)">
         Load {{productsToLoad}} more...
     </button>
 </div>

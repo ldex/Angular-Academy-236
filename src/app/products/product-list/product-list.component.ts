@@ -21,14 +21,16 @@ export class ProductListComponent implements OnInit {
   mostExpensiveProduct$: Observable<Product>;
   productsNumber$: Observable<number>;
   productsTotalNumber$: Observable<number>;
+  isLastPage$: Observable<boolean>;
+  canLoadMore$: Observable<boolean>;
   errorMessage;
 
   // Pagination
-  pageSize = 5;
+  productsToLoad = this.productService.productsToLoad;
+  pageSize = this.productsToLoad / 2;
   start = 0;
   end = this.pageSize;
   currentPage = 1;
-  productsToLoad = this.pageSize * 2;
 
   previousPage() {
     this.start -= this.pageSize;
@@ -87,6 +89,13 @@ export class ProductListComponent implements OnInit {
     this.productsTotalNumber$ = this
                                   .productService
                                   .productsTotalNumber$;
+
+    this.isLastPage$ = combineLatest([this.productsNumber$, this.productsTotalNumber$])
+                                .pipe(
+                                  map(([productsNumber, productsTotalNumber]) =>
+                                    productsNumber >= productsTotalNumber
+                                  )
+                                );
 
     this.mostExpensiveProduct$ = this
                                   .productService
