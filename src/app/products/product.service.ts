@@ -14,7 +14,7 @@ export class ProductService {
   products$: Observable<Product[]> = this.productsSubject.asObservable();
   mostExpensiveProduct$: Observable<Product>;
   productsTotalNumber$: Observable<number>;
-  productsToLoad: number = 100;
+  productsToLoad: number = 10;
 
   constructor(private http: HttpClient) {
     this.initProducts();
@@ -45,6 +45,14 @@ export class ProductService {
       )
   }
 
+  getProductById(id: number): Observable<Product> {
+    return this
+            .products$
+            .pipe(
+              map(products => products.find(p => p.id === id))
+            );
+  }
+
   initProducts(skip: number = 0, take: number = this.productsToLoad) {
     let url = this.baseUrl + `?$skip=${skip}&$top=${take}&$orderby=ModifiedDate%20desc`;
 
@@ -63,7 +71,7 @@ export class ProductService {
         )
       )
       .subscribe(
-        fullProductsList => this.productsSubject.next(fullProductsList)
+        mergedProducts => this.productsSubject.next(mergedProducts)
       );
   }
 
@@ -74,4 +82,10 @@ export class ProductService {
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(this.baseUrl + id);
   }
+
+  resetList() {
+    this.productsSubject.next([]);
+    this.initProducts();
+  }
+
 }

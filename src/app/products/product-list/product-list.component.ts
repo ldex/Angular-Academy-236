@@ -91,11 +91,11 @@ export class ProductListComponent implements OnInit {
                                   .productsTotalNumber$;
 
     this.isLastPage$ = combineLatest([this.productsNumber$, this.productsTotalNumber$])
-                                .pipe(
-                                  map(([productsNumber, productsTotalNumber]) =>
-                                    productsNumber >= productsTotalNumber
-                                  )
-                                );
+                                  .pipe(
+                                    map(([productsNumber, productsTotalNumber]) =>
+                                      productsNumber >= productsTotalNumber
+                                    )
+                                  );
 
     this.mostExpensiveProduct$ = this
                                   .productService
@@ -103,7 +103,7 @@ export class ProductListComponent implements OnInit {
   }
 
   refresh() {
-    this.productService.initProducts();
+    this.productService.resetList();
     this.router.navigateByUrl('/products'); // Self route navigation
   }
 }

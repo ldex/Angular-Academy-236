@@ -29,11 +29,7 @@ export class ProductDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = + this.activatedRoute.snapshot.params['id'];
     this
-      .productService
-      .products$
-      .pipe(
-        map(products => products.find(p => p.id === id))
-      )
+      .productService.getProductById(id)
       .subscribe(
         product => this.product = product
       )
